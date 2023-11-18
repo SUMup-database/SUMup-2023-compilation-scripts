@@ -1,0 +1,22 @@
+reference_short,start_year,end_year,num_measurements,reference_key
+Mulvaney et al. (2002),1000,1994,995,85
+Oerter et al. (2000),1025,1996,5437,84
+US-ITASE et al. (2013),1430,2002,4336,1
+"Graf et al. (1988a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q)",1461,1985,565,82
+Banta et al. (2008),1521,2004,714,9
+Philippe et al. (2016),1745,2011,267,81
+Verfaillie et al. (1345),1799,2009,20841,2
+Ferris et al. (2011),1800,2003,204,4
+Medley et al. (2013),1800,2010,448,7
+Spikes et al. (2005),1815,2000,59768,11
+"Fernandoy et al. (2010a,b,c,d)",1935,2006,247,"65, 70, 72, 88"
+"Graf and Oerter (2006a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z)",1936,1990,397,"38, 39, 40, 41, 42, 43, 45, 46, 47, 48, 49, 50, 51, 52, 53, 60, 62, 63, 64, 66, 67, 68"
+"Graf et al. (1999a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p)",1946,1994,454,"54, 55, 56, 57, 58, 59, 61, 69, 71, 83"
+Schlosser et al. (2002b),1955,1997,43,44
+"Wagenbach et al. (1994a,b)",1962,1989,48,"73, 74"
+SEAT10 et al. (2013),1966,2010,198,3
+"Anschütz et al. (2007a,b,c,d,e,f)",1966,2003,174,"75, 76, 77, 78, 79, 80"
+Schlosser et al. (2002),1975,1988,14,37
+Morris et al. (2017),1985,2013,21,87
+Konrad et al. (2019),1985,2014,61334,86
+"Oerter et al. (2008a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p)",1990,2005,204,"22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36"

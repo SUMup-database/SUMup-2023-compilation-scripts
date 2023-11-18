@@ -1,0 +1,22 @@
+\babel@toc {english}{}\relax 
+\contentsline {section}{\numberline {1}The SUMup project}{4}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Background}{4}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Terms of use}{4}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Acknowledgment}{4}{subsection.1.3}%
+\contentsline {section}{\numberline {2}List of datasets added to the 2023 release}{4}{section.2}%
+\contentsline {subsection}{\numberline {2.1}New surface mass balance data}{4}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}New density data}{5}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}New temperature data}{5}{subsection.2.3}%
+\contentsline {section}{\numberline {3}The density data files}{6}{section.3}%
+\contentsline {subsection}{\numberline {3.1}NetCDF files}{6}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}CSV files}{6}{subsection.3.2}%
+\contentsline {section}{\numberline {4}The SMB data files}{7}{section.4}%
+\contentsline {subsection}{\numberline {4.1}NetCDF files}{7}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}CSV files}{8}{subsection.4.2}%
+\contentsline {section}{\numberline {5}The temperature data files}{9}{section.5}%
+\contentsline {subsection}{\numberline {5.1}NetCDF files}{9}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}CSV files}{10}{subsection.5.2}%
+\contentsline {section}{\numberline {6}Dataset overview}{11}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Density}{11}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}SMB}{18}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Temperature}{22}{subsection.6.3}%

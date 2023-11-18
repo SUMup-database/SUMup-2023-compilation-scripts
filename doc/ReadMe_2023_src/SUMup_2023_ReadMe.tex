@@ -1,0 +1,473 @@
+\documentclass[journal abbreviation, manuscript]{copernicus}
+\usepackage{enumitem}
+\setitemize{noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{longtable}
+\usepackage{csvsimple}
+\usepackage{multicol}
+\usepackage[section]{placeins}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\usepackage{datatool}
+\usepackage{fp}
+\let\unit=\unitOld
+\usepackage{siunitx}
+\usepackage{hyperref}
+\hypersetup{
+  pdftex,
+  colorlinks=true,
+  allcolors=blue,
+}
+\usepackage{hypcap}
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+\lstloadlanguages{ 
+ Python
+}
+\begin{document}
+
+\title{The SUMup collaborative database:
+Surface mass balance, subsurface temperature and density measurements from the Greenland and Antarctic ice sheets}
+
+\input{author_list.tex}
+\correspondence{B.Vandecrux (bav@geus.dk)}
+\runningtitle{The SUMup collaborative dataset}
+\runningauthor{Vandecrux et al.}
+
+\firstpage{1}
+
+\maketitle
+
+
+% Load CSV files with specified keys
+\DTLloadrawdb[keys={index,total,added,nr_references,greenland,antarctica}]{density}{tables//density_meta.csv}
+\DTLloadrawdb[keys={index,total,added,nr_references}]{smb}{tables//SMB_meta.csv}
+\DTLloadrawdb[keys={index,total,added,nr_references}]{temperature}{tables//temperature_meta.csv}
+
+% Fetch and store the total values from each table
+\DTLgetvalueforkey{\DensityTotal}{total}{density}{index}{0}
+\DTLgetvalueforkey{\SMBTotal}{total}{smb}{index}{0}
+\DTLgetvalueforkey{\TemperatureTotal}{total}{temperature}{index}{0}
+\DTLgetvalueforkey{\DensityNew}{added}{density}{index}{0}
+\DTLgetvalueforkey{\SMBNew}{added}{smb}{index}{0}
+\DTLgetvalueforkey{\TemperatureNew}{added}{temperature}{index}{0}
+
+% Calculate the sum using the fp package
+\FPeval{\SumOfTotals}{clip(\DensityTotal+\SMBTotal+\TemperatureTotal)}
+
+\pdfbookmark[1]{Abstract}{abstract}
+\begin{abstract}
+The SUMup database is a compilation of surface mass balance (SMB), subsurface temperature and density measurements from the Greenland and Antarctic ice sheets available at [final DOI] (Vandecrux et al., 2023). This 2023 release contains \num[group-separator={\,}]{\SumOfTotals} data points:  \num[group-separator={\,}]{\SMBTotal} SMB measurements, \num[group-separator={\,}]{\DensityTotal} density measurements and \num[group-separator={\,}]{\TemperatureTotal} subsurface temperature measurements. This is respectively \num[group-separator={\,}]{\SMBNew}, \num[group-separator={\,}]{\DensityNew} and \num[group-separator={\,}]{\TemperatureNew} additional observations of SMB, density and temperature compared to the 2022 release. This new release provides not only snow accumulation on ice sheets, like its predecessors, but all types of SMB measurements, including from ablation areas. On the other hand, snow depth on sea ice is discontinued, but can still be found in the previous releases. The data files are provided in both CSV and NetCDF format and contain, for each measurement, the following metadata: latitude, longitude, elevation, timestamp, method, reference of the data source and, when applicable, the name of the measurement group it belongs to (core name for SMB, profile name for density, station name for temperature). Data users are encouraged to cite all the original data sources that are being used. Issues about this release as well as suggestions of datasets to be added in next releases can be done on a \href{https://github.com/SUMup-database/SUMup-data-suggestion/issues}{dedicated user forum}. Example scripts to use the SUMup 2023 files are made available on our \href{https://github.com/SUMup-database/SUMup-example-scripts}{script repository}. SUMup is a community effort and help to compile and curate the database is welcome.
+
+\end{abstract}
+
+\pagebreak
+\tableofcontents
+\pagebreak
+% \copyrightstatement{TEXT}
+
+
+\pdfbookmark[1]{Introduction: The SUMup project}{intro}
+\introduction[The SUMup project]
+\pdfbookmark[2]{Background}{bg}
+\subsection{Background}
+The SUMup database is a community effort to distribute easy-to-use in-situ data to improve surface mass balance modeling and remote sensing efforts, and it is a compilation of work from many individual researchers. It covers measurements of snow and firn density, subsurface temperatures, surface mass balance on the Greenland and Antarctic ice sheets and their peripheral glaciers. After being sponsored by NASA, and by the Scientific Committee on Antarctic Research (SCAR), it is now continued by the Geological Survey of Denmark and Greenland until another group carries it forward. For questions regarding the dataset, please contact the current compiler, Baptiste Vandecrux (bav@geus.dk).
+
+
+\pdfbookmark[2]{Terms of use}{tou}
+\subsection{Terms of use}
+
+When using this dataset, please cite both the individual studies who provided the data (see the reference key given for each measurement and associated reference list) as well as the SUMup dataset itself:
+Vandecrux, B., Thompson-Munson, M.: The SUMup database: measurements of surface mass balance, density, temperature on the Greenland and Antarctic ice sheets and their peripheral glaciers (2023 Edition), Arctic Data Center, DOI, 2023.
+Contributing to the Dataset
+If you would like to contribute to the dataset, reach out to Baptiste Vandecrux (bav@geus.dk) for more details.
+
+\pdfbookmark[2]{Acknowledgement}{acknowledgement}
+\subsection{Acknowledgement}
+
+The SUMup working group was previously supported by the NASA Cryospheric Sciences Program and the National Science Foundation and the SCAR AntClimNow Dataset Stewardship grant. Now the maintenance of this dataset is supported by the Programme for Monitoring of the Greenland ice sheet (PROMICE), which is supported by the Danish Ministry for Environment, Energy and Utilities.
+
+\pdfbookmark[1]{List of datasets added to the 2023 release}{list}
+\section{List of datasets added to the 2023 release}
+\pdfbookmark[2]{New surface mass balance data}{newSMB}
+\subsection{New surface mass balance data}
+
+Greenland:
+
+\noindent\fbox{%
+    \parbox{\textwidth}{%
+\begin{multicols}{2}
+    \begin{itemize}
+    \item Machguth et al. (2016) historical SMB compilation
+    \item GGU, GEUS stakes
+    \item Box et al. (2013) core compilation
+    \begin{itemize}
+        \item ACT4, 10, 11
+        \item Extended PARCA cores (Basin1-9, GITS, Humboldt, NASA-U)
+        \item Other historical cores (Camp Century, D1-5, Das1-2, Sandy…)
+    \end{itemize}
+    \item Hanna et al. (2006) core compilation
+    \item Extended PARCA cores (CP1, UAK…)
+    \item Lewis et al. (2017) ice bridge data
+    \item Lewis et al. (2019) ground-based GPR data
+    \item Montgomery et al. (2020) ice bridge data
+    \item Karlsson et al. (2016) ice bridge
+    \item AWI NGT 1994 2011-2012
+    \item PROMICE daily ablation (and summed for ablation season)
+    \item SE Dome,  Kawakami and Iizuka
+    \item Kjær et al. 2021
+    \end{itemize}
+\end{multicols}
+    }%
+}
+
+Antarctica:
+
+No SMB data has been added for Antarctica. Please refer to the recent compilation effort: AntSMB.
+\subsection{New density data}
+
+Greenland:
+
+\noindent\fbox{%
+    \parbox{\textwidth}{%
+\begin{multicols}{2}
+    \begin{itemize}
+    \item Historical data: Wegener 1930/31, Sorges’, EGIG
+    \item EGIG cores from Fisher 1990
+    \item Kameda Site J
+    \item AWI NGT 1995
+    \item Spencer compilation of historical profiles
+    \item Van der Veen 2001 report
+    \item Secondary PARCA cores (Humboldt, NASA-U, GITS, Tunu-N)
+    \item Porter and Higgins core
+    \item NEEM and NGRIP shallow cores
+    \item BRPC 2012 report
+    \item Morris and Wingham EGIG line
+    \item Camp Century Climate cores
+    \item Clerx et al. (2022)
+    \item Harper (2022) cores on EGIG
+    \item GEUS snow pit and firn core data (inc. historical GC-Net snow pit, GC-Net 2022 and GC-Net 2023)
+    \end{itemize}
+\end{multicols}
+    }%
+}
+
+Antarctica:
+
+\noindent\fbox{%
+    \parbox{\textwidth}{%
+\begin{multicols}{2}
+    \begin{itemize}
+    \item Akers et al. (2022)
+    \item Albert (2015)
+    \item Fourteau et al. (2019)
+    \item Stevens et al, (2023)
+    \end{itemize}
+\end{multicols}
+    }%
+}
+
+\subsection{New temperature data}
+
+Greenland:
+Compilation of monthly 10 m Greenland temperature from https://doi.org/10.5194/tc-2023-105, that contains post-processed temperature string data:
+\begin{itemize}
+\item GC-Net and PROMICE 
+\item FirnCover
+\item IMAU
+\item Aquifer sites
+\item Harper, Humphrey, Hills, Law, Charalampidis...
+\end{itemize}
+Isolated measurements:
+\begin{itemize}
+\item CRREL reports (Benson, Mock and Weeks, Schytt…)
+\item Japanese SIGMA stations
+\item Historical measurements from EGIG, deQuervain, Wegener, Koch
+\end{itemize}
+
+Antarctica:
+More to come
+
+\section{The density data files}
+\subsection{NetCDF files}
+
+All variables are packed in 
+\begin{itemize}
+\item SUMup\_2023\_density\_antarctica.nc
+\item SUMup\_2023\_density\_greenland.nc
+\end{itemize}
+
+Due to different dimensionality, the DATA and METADATA variables are saved as two different groups in the NetCDF files
+
+In python:
+\begin{lstlisting}[language=python]
+import xarray as xr
+path_to_SUMup_folder = "."
+ds_density = xr.open_dataset(
+    path_to_SUMup_folder + 'SUMup_2023_density_greenland.nc', 
+    group='DATA'
+    )
+ds_meta = xr.open_dataset(
+    path_to_SUMup_folder + 'SUMup_2023_density_greenland.nc',
+    group='METADATA'
+    )
+\end{lstlisting} 
+
+
+\subsection{CSV files}
+The “DATA” variables are given in the following comma-delimited (CSV) files 
+\begin{itemize}
+\item SUMup\_2023\_density\_antarctica.csv 
+\item SUMup\_2023\_density\_greenland.csv 
+\end{itemize}
+
+while the “METADATA” variables are given in the tab-delimited (TSV) files
+\begin{itemize}
+\item SUMup\_2023\_density\_methods.tsv
+\item SUMup\_2023\_density\_profile\_names.tsv
+\item SUMup\_2023\_density\_references.tsv
+\end{itemize}
+
+\input{tables/data_file_density}
+
+\section{The SMB data files}
+\subsection{NetCDF files}
+
+All variables are packed in 
+
+\begin{itemize}
+\item SUMup\_2023\_SMB\_antarctica.nc
+\item SUMup\_2023\_SMB\_greenland.nc
+\end{itemize}
+Due to different dimensionality, the DATA and METADATA variables are saved as two different groups in the NetCDF files
+
+In python:
+\begin{lstlisting}[language=python]
+import xarray as xr
+path_to_SUMup_folder = "./"
+ds_SMB = xr.open_dataset(
+    path_to_SUMup_folder + 'SUMup_2023_SMB_greenland.nc', 
+    group='DATA'
+    )
+ds_meta = xr.open_dataset(
+    path_to_SUMup_folder + 'SUMup_2023_SMB_greenland.nc',
+    group='METADATA'
+    )
+\end{lstlisting} 
+
+\subsection{CSV files}
+The “DATA” variables are given in 
+\begin{itemize}
+\item SUMup\_2023\_SMB\_antarctica.csv 
+\item SUMup\_2023\_SMB\_greenland.csv 
+\end{itemize}
+while the “METADATA” variables are given in the tab-delimited (TSV) files
+\begin{itemize}
+\item SUMup\_2023\_SMB\_methods.tsv
+\item SUMup\_2023\_SMB\_profile\_names.tsv
+\item SUMup\_2023\_SMB\_references.tsv
+\end{itemize}
+
+\input{tables/data_file_smb}
+
+\section{The temperature data files}
+\subsection{NetCDF files}
+
+All variables are packed in 
+\begin{itemize}
+\item SUMup\_2023\_temperature\_antarctica.nc
+\item SUMup\_2023\_temperature\_greenland.nc
+\end{itemize}
+Due to different dimensionality, the DATA and METADATA variables are saved as two different groups in the NetCDF files
+
+In python:
+\begin{lstlisting}[language=python]
+import xarray as xr
+path_to_SUMup_folder = "./"
+ds_temperature = xr.open_dataset(
+    path_to_SUMup_folder + 'SUMup_2023_temperature_greenland.nc', 
+    group='DATA'
+    )
+ds_meta = xr.open_dataset(
+    path_to_SUMup_folder + 'SUMup_2023_temperature_greenland.nc',
+    group='METADATA'
+    )
+\end{lstlisting} 
+
+\subsection{CSV files}
+The “DATA” variables are given in 
+\begin{itemize}
+\item SUMup\_2023\_temperature\_antarctica.csv 
+\item SUMup\_2023\_temperature\_greenland.csv 
+\end{itemize}
+while the “METADATA” variables are given in the tab-delimited (TSV) files (because of commas being used in references)
+\begin{itemize}
+\item SUMup\_2023\_temperature\_methods.tsv
+\item SUMup\_2023\_temperature\_profile\_names.tsv
+\item SUMup\_2023\_temperature\_references.tsv
+\end{itemize}
+
+\input{tables/data_file_temperature}
+
+\section{Dataset overview}
+\subsection{Density}
+\small
+\csvautolongtable[
+ table head=\caption{Origins and temporal coverage of the density data in Greenland}\label{tab:comp_dens_gr}\\\hline
+               \csvlinetotablerow\\\hline
+               \endfirsthead\hline
+               \csvlinetotablerow\\\hline
+               \endhead\hline
+               \endfoot,
+               respect all]{tables/composition_density_greenland.csv}
+\small
+\csvautolongtable[
+ table head=\caption{Origins and temporal coverage of the density data in Antarctica}\label{tab:comp_dens_ant}\\\hline
+               \csvlinetotablerow\\\hline
+               \endfirsthead\hline
+               \csvlinetotablerow\\\hline
+               \endhead\hline
+               \endfoot,
+               respect all]{tables/composition_density_antarctica.csv}
+
+\begin{figure}[!htb]
+\caption{Spatial distribution of the density measurements}
+\centering
+\includegraphics[width=0.45\textwidth]{figures/density_map_greenland.png}
+\includegraphics[width=0.45\textwidth]{figures/density_map_antarctica.png}
+\end{figure}
+
+\begin{figure}[!htb]
+\caption{Composition of the density dataset in Greenland}
+\centering
+\includegraphics[width=0.8\textwidth]{figures/density_dataset_composition_greenland.png}
+\end{figure}
+
+
+\begin{figure}[!htb]
+\caption{Composition of the density dataset in Antarctica}
+\centering
+\includegraphics[width=0.8\textwidth]{figures/density_dataset_composition_antarctica.png}
+\end{figure}
+
+\FloatBarrier
+\subsection{SMB}
+\small
+\csvautolongtable[
+ table head=\caption{Origins and temporal coverage of the SMB data in Greenland}\label{tab:comp_smb_gr}\\\hline
+               \csvlinetotablerow\\\hline
+               \endfirsthead\hline
+               \csvlinetotablerow\\\hline
+               \endhead\hline
+               \endfoot,
+               respect all]{tables/composition_SMB_greenland.csv}
+\small
+\csvautolongtable[
+ table head=\caption{Origins and temporal coverage of the SMB data in Antarctica}\label{tab:comp_smb_ant}\\\hline
+               \csvlinetotablerow\\\hline
+               \endfirsthead\hline
+               \csvlinetotablerow\\\hline
+               \endhead\hline
+               \endfoot,
+               respect all]{tables/composition_SMB_antarctica.csv}
+
+\begin{figure}[!htb]
+\caption{Spatial distribution of the SMB measurements}
+\centering
+\includegraphics[width=0.45\textwidth]{figures/SMB_map_greenland.png}
+\includegraphics[width=0.45\textwidth]{figures/SMB_map_antarctica.png}
+\end{figure}
+
+\begin{figure}[!htb]
+\caption{Composition of the SMB dataset in Greenland}
+\centering
+\includegraphics[width=0.8\textwidth]{figures/SMB_dataset_composition_greenland.png}
+\end{figure}
+
+
+\begin{figure}[!htb]
+\caption{Composition of the SMB dataset in Antarctica}
+\centering
+\includegraphics[width=0.8\textwidth]{figures/SMB_dataset_composition_antarctica.png}
+\end{figure}
+
+\FloatBarrier
+\subsection{Temperature}
+\small
+\csvautolongtable[
+ table head=\caption{Origins and temporal coverage of the temperature data in Greenland}\label{tab:comp_temp_gr}\\\hline
+               \csvlinetotablerow\\\hline
+               \endfirsthead\hline
+               \csvlinetotablerow\\\hline
+               \endhead\hline
+               \endfoot,
+               respect all]{tables/composition_temperature_greenland.csv}
+\small
+\csvautolongtable[
+ table head=\caption{Origins and temporal coverage of the temperature data in Antarctica}\label{tab:comp_temp_ant}\\\hline
+               \csvlinetotablerow\\\hline
+               \endfirsthead\hline
+               \csvlinetotablerow\\\hline
+               \endhead\hline
+               \endfoot,
+               respect all]{tables/composition_temperature_antarctica.csv}
+
+\begin{figure}[!htb]
+\caption{Spatial distribution of the temperature measurements}
+\centering
+\includegraphics[width=0.45\textwidth]{figures/temperature_map_greenland.png}
+\includegraphics[width=0.45\textwidth]{figures/temperature_map_antarctica.png}
+\end{figure}
+
+\begin{figure}[!htb]
+\caption{Composition of the temperature dataset in Greenland}
+\centering
+\includegraphics[width=0.8\textwidth]{figures/temperature_dataset_composition_greenland.png}
+\end{figure}
+
+
+\begin{figure}[!htb]
+\caption{Composition of the temperature dataset in Antarctica}
+\centering
+\includegraphics[width=0.8\textwidth]{figures/temperature_dataset_composition_antarctica.png}
+\end{figure}
+
+%\conclusions  %% \conclusions[modified heading if necessary]
+%\dataavailability{TEXT} %% use this section when having only data sets available
+%\codedataavailability{TEXT} 
+%\noappendix       %% use this to mark the end of the appendix section
+%\authorcontribution{TEXT} 
+%\begin{acknowledgements}
+%TEXT
+%\end{acknowledgements}
+%% REFERENCES
+%% The reference list is compiled as follows:
+%\begin{thebibliography}{}
+%\bibitem[AUTHOR(YEAR)]{LABEL1}
+%REFERENCE 1
+%\bibitem[AUTHOR(YEAR)]{LABEL2}
+%REFERENCE 2
+%\end{thebibliography}
+
+\end{document}
