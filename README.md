@@ -14,6 +14,9 @@ Surface mass balance, subsurface temperature and density measurements from the G
 </strong>
 </h1> 
 
+## This repository contains the scripts used for compiling the different datasets
+[Another repository contains the raw data but kept private](https://github.com/SUMup-database/SUMup-2023) access can be granted to however wants to become a maintener.
+
 ## Quick links:
 - [Latest official release (2022)](https://doi.org/10.18739/A24Q7QR58)
 - [The SUMup 2023 beta version](SUMup%202023%20beta/)
