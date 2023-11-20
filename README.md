@@ -18,11 +18,11 @@ Surface mass balance, subsurface temperature and density measurements from the G
 [Another repository contains the raw data but is kept private](https://github.com/SUMup-database/SUMup-2023). Access will be granted to however wants to become a maintener.
 
 ## Quick links:
-- [Latest official release (2022)](https://doi.org/10.18739/A24Q7QR58)
 - [The SUMup 2023 release](https://arcticdata.io/catalog/view/urn%3Auuid%3A57f4cf76-1470-4ad2-b2ed-69e52ce85387)
 - [Example Python scripts / Jupyter notebooks to manipulate the 2023 files](https://github.com/SUMup-database/SUMup-example-scripts)
 - [The new netcdf format](https://github.com/SUMup-database/SUMup-2023-compilation-scripts#the-new-netcdf-structure)
 - [The CSV files](https://github.com/SUMup-database/SUMup-2023-compilation-scripts#the-csv-files)
+- [2022 release](https://doi.org/10.18739/A24Q7QR58)
 
 ## The 2023 (beta) release
 ### Important notes on the 2023 release:
