@@ -85,8 +85,7 @@ df_sumup = pd.concat((df_sumup.loc[msk,:], df_vdx), ignore_index=True)
 
 #%% Amory compilation
 print('loading Amory compilation')
-df=pd.read_csv('data/temperature data/Amory compilation/T10m_Amory.csv',
-               encoding='mbcs', sep=';')
+df=pd.read_csv('data/temperature data/Amory compilation/T10m_Amory.csv', sep=';')
 df.columns =['name_str','latitude','longitude','depth','temperature','reference_short', 
              'date','elevation','reference_full','method_str']
 df['date'] = df.date.str.replace('//','/')
@@ -134,6 +133,9 @@ df_sumup.loc[df_sumup.reference_full.str.startswith('Fausto'), 'reference_full']
 
 df_sumup.loc[df_sumup.reference_full.str.startswith('Clausen HB and Stauffer B (1988)'),
              'reference_short'] = 'Clausen and Stauffer (1988)'
+
+df_sumup.loc[df_sumup.reference_full.str.startswith('Charalampidis'),
+             'reference_short'] = 'Charalampidis et al. (2016, 2022)'
 # tmp = df_sumup.reference_full.unique()
 
 print(df_sumup.shape[0], 'temperature observations after merging from', len(df_sumup.reference_full.unique()), 'sources')
@@ -210,6 +212,7 @@ def write_netcdf(df_sumup, filename):
     df_new['timestamp'] = pd.to_datetime(df_new.timestamp).dt.tz_localize(None)
 
     df_new.index.name='measurement_id'
+    assert (~df_new.index.duplicated()).all(), 'non-unique measurement-id "'
 
     ds_meta_name = (df_new[['name_key','name']]
                     .drop_duplicates()
@@ -334,3 +337,11 @@ plot_map(df_sumup.loc[df_sumup.latitude<0,['latitude','longitude']].drop_duplica
 print_table_dataset_composition(df_sumup.loc[df_sumup.latitude>0]).to_csv('doc/ReadMe_2023_src/tables/composition_temperature_greenland.csv',index=None)
 
 print_table_dataset_composition(df_sumup.loc[df_sumup.latitude<0]).to_csv('doc/ReadMe_2023_src/tables/composition_temperature_antarctica.csv',index=None)
+
+print('writing out measurement locations')
+print_location_file(df_sumup.loc[df_sumup.latitude>0,:], 
+                    'doc/GIS/SUMup_2023_temperature_location_greenland.csv')
+
+print_location_file(df_sumup.loc[df_sumup.latitude<0, :],
+                    'doc/GIS/SUMup_2023_temperature_location_antarctica.csv')
+

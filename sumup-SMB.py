@@ -443,7 +443,7 @@ for sheet in sheet_list[4:]:
                     )
     
     df[['start_year', 'end_year']] = np.nan
-    df_sumup = pd.concat((df_sumup, df[col_needed]))
+    df_sumup = pd.concat((df_sumup, df[col_needed]), ignore_index=True)
 
 
 # %% Box compilation
@@ -467,6 +467,7 @@ df['start_date'] = pd.to_datetime(df.TimeStart, errors='coerce')
 df['end_date'] = pd.to_datetime(df.TimeEnd, errors='coerce')
 df['longitude'] = -df.longitude.abs()
 df['smb'] = df['smb']/1000
+df['error'] = df['error']/1000
 
 msk = df.name_str.str.lower().str.replace(' ','').isin(
     pd.DataFrame(['ACT-10a', 'ACT-10b', 'ACT-10c', 'ACT-11b', 'ACT-11c', 
@@ -540,7 +541,7 @@ df.loc[df.method_str=='pit',  'method'] = 4
 df.loc[df.method_str=='pit',  'method_str'] = 'snow pits'
 # check_duplicates (df, df_sumup, plot=False)
 
-df_sumup = pd.concat((df_sumup, df[col_needed]))
+df_sumup = pd.concat((df_sumup, df[col_needed]), ignore_index=True)
 
 
 # %% Lewis et al. 2017
@@ -571,7 +572,7 @@ df_stack['reference_full'] = 'Lewis, G., Osterberg, E., Hawley, R., Whitmore, B.
 df_stack['name'] = resolve_name_keys(df_stack, df_sumup)
 df_stack['reference'] = resolve_reference_keys(df_stack, df_sumup)
 
-df_sumup = pd.concat((df_sumup, df_stack[col_needed]))
+df_sumup = pd.concat((df_sumup, df_stack[col_needed]), ignore_index=True)
 
 
 # %% Montgomery et al. 2020
@@ -582,7 +583,7 @@ df= df.rename(columns= {'accumulation (m w.e.)': 'smb'})
 df.year = pd.to_numeric(df.year, errors='coerce')
 df = df.loc[df.year.notnull(),:]
 df['start_year'] = df.year.astype(int)
-df['end_year'] = (df.year-1).astype(int)
+df['end_year'] = df.year.astype(int)
 df[['start_date', 'end_date']] = np.nan
 
 df['notes'] = 'value given from end of last summer (uncertain) to measurement time in spring (not available in data file)'
@@ -597,7 +598,7 @@ df['reference_full'] = 'Montgomery L, Koenig L, Lenaerts JTM, Kuipers Munneke P 
 df['name'] = resolve_name_keys(df, df_sumup)
 df['reference'] = resolve_reference_keys(df, df_sumup)
 
-df_sumup = pd.concat((df_sumup, df[col_needed]))
+df_sumup = pd.concat((df_sumup, df[col_needed]), ignore_index=True)
 
 # %% Lewis et al. 2019 GPR
 print('Lewis et al. 2019')
@@ -630,7 +631,7 @@ df_stack['reference_full'] = df_ref.loc[90].values[0]
 df_stack['name'] = resolve_name_keys(df_stack, df_sumup)
 df_stack['reference'] = resolve_reference_keys(df_stack, df_sumup)
 
-df_sumup = pd.concat((df_sumup, df_stack[col_needed]))
+df_sumup = pd.concat((df_sumup, df_stack[col_needed]), ignore_index=True)
 
 # %% AWI NGT data
 print('Freitag and Vinther NGT')
@@ -668,7 +669,7 @@ for f in os.listdir('data/SMB data/AWI NGT'):
     df['reference'] = resolve_reference_keys(df, df_sumup)
     print(df[['name_str', 'latitude','longitude','elevation', 'reference_short','name','reference']].drop_duplicates().values)
     
-    df_sumup = pd.concat((df_sumup, df[col_needed]))
+    df_sumup = pd.concat((df_sumup, df[col_needed]), ignore_index=True)
 
 # %% Miller and Schwager 2004 NGT
 print('Miller and Schwager 2004 NGT')
@@ -707,7 +708,7 @@ for f in os.listdir('data/SMB data/Miller and Schwager 2004 NGT'):
     df['reference'] = resolve_reference_keys(df, df_sumup)
     print(df[['name_str', 'latitude','longitude','elevation', 'reference_short','name','reference']].drop_duplicates().values)
     
-    df_sumup = pd.concat((df_sumup, df[col_needed]))
+    df_sumup = pd.concat((df_sumup, df[col_needed]), ignore_index=True)
 # %% Weissbach_2016
 # Smoothed profiles: 
 # print('Weissbach_2016 NGT')
@@ -747,7 +748,7 @@ for f in os.listdir('data/SMB data/Miller and Schwager 2004 NGT'):
 #     df['reference'] = resolve_reference_keys(df, df_ref, df_sumup)
 #     print(df[['name_str', 'latitude','longitude','elevation', 'reference_short','name','reference']].drop_duplicates().values)
     
-#     df_sumup = pd.concat((df_sumup, df[col_needed]))
+#     df_sumup = pd.concat((df_sumup, df[col_needed]), ignore_index=True)
     
 # %% Karlsson et al. 2016
 print('Karlsson et al. 2016')
@@ -783,7 +784,7 @@ df_stack['reference_full'] = df_meta.iloc[1].values[0].split('\t')[1]
 df_stack['name'] = resolve_name_keys(df_stack, df_sumup)
 df_stack['reference'] = resolve_reference_keys(df_stack, df_sumup)
 
-df_sumup = pd.concat((df_sumup, df_stack[col_needed]))
+df_sumup = pd.concat((df_sumup, df_stack[col_needed]), ignore_index=True)
 
 # %% Box 2013 compilation
 print('Box 2013 compilation')
@@ -985,7 +986,7 @@ for p in df_stack.name_str.unique():
             print(df_all_candidates.to_markdown())
             print('===> adding it anyway')
     
-df_sumup = pd.concat((df_sumup, df_stack[col_needed]))    
+df_sumup = pd.concat((df_sumup, df_stack[col_needed]), ignore_index=True)    
 
 # %% NSIDC files
 # not added because of degraded resolution
@@ -1046,7 +1047,7 @@ for f in os.listdir('data/SMB data/NSIDC_Crete_Milcent_Summit_Osman'):
     df['name'] = resolve_name_keys(df, df_sumup)
     df['reference'] = resolve_reference_keys(df, df_sumup)
     check_duplicates(df, df_sumup, verbose = True, plot=True, tol=0.6)
-    df_sumup = pd.concat((df_sumup, df[col_needed]))    
+    df_sumup = pd.concat((df_sumup, df[col_needed]), ignore_index=True)    
 
 
 # %% SE Dome II 
@@ -1077,7 +1078,7 @@ df['reference_full'] = 'Iizuka, Y. , Matoba, S. , Yamasaki, T. , Oyabu, I. , Kad
 df['method'] = 10
 df['method_str'] = 'firn or ice core, H2O2 dating'
 
-df_sumup = pd.concat((df_sumup, df[col_needed]))    
+df_sumup = pd.concat((df_sumup, df[col_needed]), ignore_index=True)    
      
 # %% GRIP 
 # not added because of degraded resolution
@@ -1116,7 +1117,7 @@ print(df[['name_str', 'latitude','longitude','elevation', 'reference_short','nam
 
 df.set_index('end_year').smb.plot(marker='o', ls='None')
 
-df_sumup = pd.concat((df_sumup, df[col_needed]))        
+df_sumup = pd.concat((df_sumup, df[col_needed]), ignore_index=True)        
 
 
 # %% Kjær et al. 2021
@@ -1169,7 +1170,7 @@ df_stack['reference'] = resolve_reference_keys(df_stack, df_sumup)
 for p in df_stack.name_str.unique():
     check_duplicates(df_stack.loc[df_stack.name_str==p,:], df_sumup)
 
-df_sumup = pd.concat((df_sumup, df_stack[col_needed]))
+df_sumup = pd.concat((df_sumup, df_stack[col_needed]), ignore_index=True)
 
 # %% PROMICE daily ablation
 plt.close('all')
@@ -1205,7 +1206,7 @@ for f in os.listdir(path_dir):
     
     df_new = pd.concat((smb[['start_date','end_date','smb']],
                     smb_y.loc[smb_y.start_date.dt.year>2020,
-                              ['start_date','end_date','smb']]))
+                              ['start_date','end_date','smb']]), ignore_index=True)
     
     df_new['start_year'] = smb_y.start_date.dt.year
     df_new['end_year'] = smb_y.end_date.dt.year
@@ -1235,7 +1236,7 @@ for f in os.listdir(path_dir):
         plt.suptitle(df.site.unique()[0])
 
     # df_candidates = check_duplicates(df_new, df_sumup,tol = 0.1)
-    df_sumup = pd.concat((df_sumup, df_new[col_needed]))
+    df_sumup = pd.concat((df_sumup, df_new[col_needed]), ignore_index=True)
 
 
 # %% checking file format
@@ -1318,6 +1319,7 @@ df_sumup['name'] = df_name_new.reset_index().set_index('name').loc[df_sumup.name
 df_sumup['latitude'] = df_sumup.latitude.astype(float).round(6)
 df_sumup['longitude'] = df_sumup.longitude.astype(float).round(6)
 df_sumup['smb'] = df_sumup.smb.astype(float).round(4)
+df_sumup.loc[df_sumup['error']==0,'error'] = np.nan
 df_sumup['error'] = df_sumup.error.astype(float).round(4)
 
 df_sumup.loc[df_sumup.elevation.isnull(), 'elevation'] = -9999
@@ -1372,6 +1374,7 @@ def write_netcdf(df_sumup, filename):
     df_new['end_date'] = pd.to_datetime(df_new.end_date).dt.tz_localize(None)
 
     df_new.index.name='measurement_id'
+    assert (~df_new.index.duplicated()).all(), 'non-unique measurement-id "'
     ds_meta_name = (df_new[['name_key','name']]
                     .drop_duplicates()
                     .set_index('name_key')
@@ -1494,6 +1497,11 @@ print_table_dataset_composition(df_sumup.loc[df_sumup.latitude>0]).to_csv('doc/R
 
 print_table_dataset_composition(df_sumup.loc[df_sumup.latitude<0]).to_csv('doc/ReadMe_2023_src/tables/composition_SMB_antarctica.csv',index=None)
 
-# writing out measurement locations
-df_sumup.loc[df_sumup.latitude>0, ['name_key','name','latitude','longitude','reference_short']].drop_duplicates().to_csv('doc/GIS/SUMup_2023_smb_location_greenland.csv', index=None)
+print('writing out measurement locations')
+print_location_file(df_sumup.loc[df_sumup.latitude>0,:], 
+                    'doc/GIS/SUMup_2023_smb_location_greenland.csv')
+
+print_location_file(df_sumup.loc[df_sumup.latitude<0, :],
+                    'doc/GIS/SUMup_2023_smb_location_antarctica.csv')
+
 

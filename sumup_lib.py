@@ -17,6 +17,49 @@ import os
 # import cartopy.crs as ccrs
 # import cartopy.feature as cfeature
 
+def print_location_file(df_sumup, path_out):
+    if 'timestamp' in df_sumup.columns:
+        v_time = ['timestamp', 'timestamp']
+    else:
+        v_time = ['start_year','end_year']
+        
+    if 'profile' in df_sumup.columns:
+        v_names = ['profile_key','profile']
+    else:
+        v_names = ['name_key','name']
+        
+    tmp = df_sumup[
+            v_names + ['latitude', 'longitude','reference_key', 
+                       'method_key'] + list(dict.fromkeys(v_time))
+            ].groupby(['latitude','longitude'])
+    
+    df_loc = pd.DataFrame()
+    
+    for v in  v_names + ['reference_key', 'method_key']:
+        df_loc['list_of_'+v+'s'] = tmp[v].unique().apply(list)
+
+    df_loc['timestamp_min'] = tmp[v_time[0]].min()
+    df_loc['timestamp_max'] = tmp[v_time[1]].max()
+    df_loc['num_measurements'] = tmp['method_key'].count()
+    
+    for v in df_loc.columns:
+        df_loc[v] = (df_loc[v].astype(str)
+                    .str.replace('[','')
+                    .str.replace(']','')
+                    .str.replace(' 00:00:00+00:00',''))
+        if 'key' in v:
+            df_loc[v] = (df_loc[v].astype(str)
+                        .str.replace(', ',' / ')
+                        .str.replace('  ',' '))
+        else:
+            df_loc[v] = (df_loc[v].astype(str)
+                        .str.replace('\', \'',' / ')
+                        .str.replace(',','')
+                        .str.replace('\'','')
+                        .str.replace('  ',' '))
+    df_loc.to_csv(path_out)
+
+
 def parse_short_reference(df_in, verbose=False):
     df_sumup = df_in.copy()
     abc = 'bcdefghijklmnopqrstuvwxyz'
@@ -109,10 +152,10 @@ def print_table_dataset_composition(df_in):
     df_summary['num_measurements'] = (df_sumup.groupby('reference_short')
                               .apply(lambda x: x.coeff.sum())
                               .reset_index(name='num_measurements')).num_measurements
-    df_summary['reference_key'] = (df_sumup.groupby('reference_short')
-                              .reference_key.unique().apply(list)
-                              .astype(str).str.replace("[","").str.replace("]","")
-                              .reset_index(name='reference_keys')).reference_keys
+    # df_summary['reference_key'] = (df_sumup.groupby('reference_short')
+    #                           .reference_key.unique().apply(list)
+    #                           .astype(str).str.replace("[","").str.replace("]","")
+    #                           .reset_index(name='reference_keys')).reference_keys
     
     return df_summary.sort_values('start_year')
     
@@ -126,21 +169,26 @@ def plot_dataset_composition(df_in, path_to_figure='figures/dataset_composition.
     df_summary=df_summary.sort_values('num_measurements')
     explode = 0.2 + 0.3*(df_summary.num_measurements.max() - df_summary.num_measurements)/df_summary.num_measurements.max()
     
+    cmap = plt.get_cmap("tab20c")
+    
     fig, ax=plt.subplots(1,1, figsize=(12,8))
     # print(df_summary.shape[0],  (1-np.exp(-df_summary.shape[0]/500)))
     plt.subplots_adjust(bottom= 0.05)
     patches, texts = plt.pie( df_summary.num_measurements,
                              startangle=90,
-                             explode=explode)
-    labels = df_summary.reference_short.str.pad(77, side='right')
+                             explode=explode,
+                             colors=plt.cm.tab20.colors)
+    labels = df_summary.reference_short.str.replace(';','\n') + ' ' + (df_summary.num_measurements/df_summary.num_measurements.sum()*100).round(3).astype(str) + ' %'
     sort_legend = True
     if sort_legend:
-        patches, labels, dummy =  zip(*sorted(zip(patches, labels, df_summary.num_measurements),
+        patches, labels, dummy =  zip(*sorted(zip(patches, labels,
+                                                  df_summary.num_measurements),
                                               key=lambda x: x[2],
                                               reverse=True))
     
-    plt.legend(patches, labels, loc='upper center', bbox_to_anchor=(0.5, 0),
-               fontsize=8, ncol=3, title='Data origin (listed clock-wise)')
+    plt.legend(patches, labels, loc='upper center', bbox_to_anchor=(0.5, -0.2),
+               fontsize=15, ncol=2, title='Data origin (listed clock-wise)',
+               columnspacing=0.5,title_fontsize='xx-large')
     plt.ylabel('')
     
     plt.savefig(path_to_figure,dpi=300, bbox_inches='tight')
@@ -495,7 +543,7 @@ def add_Greenland_profiles(df_sumup, necessary_variables, df_ref, short_ref):
             
             van_df.set_index('start_depth').density.plot(drawstyle='steps', label=profile_name)
             sumup_index_conflict = check_conflicts(df_sumup, van_df, var=['profile','date','start_depth', 'density'])
-            df_sumup = pd.concat((df_sumup, van_df), ignore_index=True)
+            df_sumup = pd.concat((df_sumup, van_df[necessary_variables]), ignore_index=True)
     plt.legend()
     
     # %% GEUS snow pit and firn core dataset
@@ -540,7 +588,7 @@ def add_Greenland_profiles(df_sumup, necessary_variables, df_ref, short_ref):
                 
             df['reference'] = ref_num_geus_snowpits
             df['reference_short'] = 'GEUS snow and firn data (2023)'
-            df['reference_full'] = 'Vandecrux, B.; Box, J.; Ahlstrøm, A.; Fausto, R.; Karlsson, N.; Rutishauser, A.; Citterio, M.; Larsen, S.; Heuer, J.; Solgaard, A.; Colgan, W., 2023, "GEUS snow and firn data in Greenland", https://doi.org/10.22008/FK2/9QEOWZ , GEUS Dataverse, V1'            
+            df['reference_full'] = 'Vandecrux, B.; Box, J.; Ahlstrøm, A.; Fausto, R.; Karlsson, N.; Rutishauser, A.; Citterio, M.; Larsen, S.; Heuer, J.; Solgaard, A.; Colgan, W.: GEUS snow and firn data in Greenland, https://doi.org/10.22008/FK2/9QEOWZ , GEUS Dataverse, 2023'            
             # if 'Nanok' in fn:
             #     df['reference'] = ref_num_nanok
             #     df['reference_short'] = 'Nanok 2022 ski expedition'
@@ -592,48 +640,86 @@ def add_Greenland_profiles(df_sumup, necessary_variables, df_ref, short_ref):
             plt.close('all')
             fig, ax = plt.subplots(figsize=(7, 6))
         for i, profile_name in enumerate(sheets):
-            if i == 0:
+            if (k==0) & (i == 0):
                 continue
-            if profile_name == 'NDYE3C':
+            if profile_name in ['STUNUB','STUNUC','SDOMEB','NASAEASTB', 'NDYE3C']:
                 continue
             df_raw =  pd.read_excel(fn, sheet_name=profile_name)
     
             df = pd.DataFrame()
             df['midpoint'] = pd.to_numeric(df_raw.iloc[5:, 0], errors='coerce')
             df['density'] = pd.to_numeric(df_raw.iloc[5:, 1], errors='coerce')
+            half_thick = (df.midpoint.values[1:] - df.midpoint.values[:-1])/2
+            half_thick = np.append(half_thick, half_thick[-1])
+            df['start_depth'] = df.midpoint - half_thick
+            df['stop_depth'] = df.midpoint + half_thick
+    
             df = df.loc[df.notnull().any(axis=1)]
-            if k == 0: date = '1997-06-01'
-            if k == 1: date = '1998-06-01'
+            # Ellen Mosley-Thompson:
+            # 1997 cores: I was not in the field for the drilling of these cores: 
+            # Joe McConnell and Roger Bales would have the dates - my name is 
+            # listed because we did the iostopes and dust analyses; I am confident 
+            # these were drilled in the April - May window 
+            if k == 0: date = '1997-05-01'
+            # Ellen Mosley-Thompson:
+            # Joe McConnell and Roger Bales were drilling these short cores and 
+            # would have the dates - my name is listed because we did the iostopes
+            # and dust analyses; I am confident these were drilled in the 
+            # April - May window 
+            if k == 1: date = '1998-05-01';
             
+            # Ellen Mosley-Thompson:
+            # Core A May 13 - 16 Core B drilled on 12-05-1998
+            if '(Raven) Core A' in profile_name: date = '1998-05-13'
+            if '(Raven) Core B' in profile_name: date = '1998-05-12'
             df['timestamp'] = date
             df['date'] = int(date.replace('-',''))
             df['latitude'] = float(df_raw.iloc[0,3].replace(' N','').replace('N',''))
             df['longitude'] =  -np.abs(float(df_raw.iloc[1,3].replace(' W','').replace('W','')))
-            df['date'] = 19970000 + k*10000
+
             df['profile'] = df_sumup.profile.max() + 1
             df['profile_name'] = profile_name
             # print(i, profile_name,df[['latitude', 'longitude']].drop_duplicates().values)
-            
             # check if already in SUMup
             sumup_index_conflict = check_conflicts(df_sumup, df,
                                     var=['profile','profile_name','date',
                                          'midpoint', 'density'],
                                     verbose=0)
-            if len(sumup_index_conflict)>0:
-                print('renaming profile', sumup_index_conflict,
-                      'to', 'PARCA_'+profile_name+'_'+str(int(df['date'].iloc[0]/10000)))
-                df_sumup.loc[df_sumup.profile==sumup_index_conflict[0],
-                             'profile_name'] = 'PARCA_'+profile_name+'_'+str(int(df['date'].iloc[0]/10000))
-                if do_plot:
-                    plt.figure()
-                    plt.plot(df.midpoint,df.density, marker='d', linestyle='None',
-                             label='raw')
-                    plt.plot(df_sumup.loc[df_sumup.profile==sumup_index_conflict[0]].midpoint,
-                             df_sumup.loc[df_sumup.profile==sumup_index_conflict[0]].density,
-                             marker='o', linestyle='None',label='sumup')
-                    plt.legend()
-                    plt.title(profile_name)
-                    plt.show()
+
+            if 'Raven' in profile_name:
+                df['error'] = -9999
+                df['reference'] = 7
+                df['elevation'] = 2119
+                df['reference_full'] = 'Mosley-Thompson, E., J.R. McConnell, R.C. Bales, Z. Li, P-N. Lin, K. Steffen, L.G. Thompson, R. Edwards, and D. Bathke, 2001, Local to Regional-Scale Variability of Greenland Accumulation from PARCA cores. Journal of Geophysical Research (Atmospheres), 106 (D24), 33,839-33,851. doi: 10.1029/2001JD900067'
+                df['reference_short'] = 'Mosley-Thompson et al. (2001)'
+                df['method'] = 4
+            
+                print('adding',profile_name,'as profile', df_sumup.profile.max() + 1)
+                df_sumup = pd.concat((df_sumup, df[necessary_variables]), ignore_index=True)
+            else:
+                if sumup_index_conflict[0] == 67: 
+                    profile_name = 'NDYE3A&B'
+                if len(sumup_index_conflict)>0:
+                    print('profile', sumup_index_conflict, 'from', 
+                          df_sumup.loc[df_sumup.profile==sumup_index_conflict[0],
+                                 'timestamp'].iloc[0],
+                          'updated to', 'PARCA_'+profile_name+'_'+str(int(df['date'].iloc[0]/10000)), date)
+                    df_sumup.loc[df_sumup.profile==sumup_index_conflict[0],
+                                 'profile_name'] = 'PARCA_'+profile_name+'_'+str(int(df['date'].iloc[0]/10000))
+                    df_sumup.loc[df_sumup.profile==sumup_index_conflict[0],
+                                 'timestamp'] = date
+                    df_sumup.loc[df_sumup.profile==sumup_index_conflict[0],
+                                 'date'] = int(date.replace('-',''))
+                    if do_plot:
+                        plt.figure()
+                        plt.plot(df.midpoint,df.density, marker='d', linestyle='None',
+                                 label='raw')
+                        plt.plot(df_sumup.loc[df_sumup.profile==sumup_index_conflict[0]].midpoint,
+                                 df_sumup.loc[df_sumup.profile==sumup_index_conflict[0]].density,
+                                 marker='o', linestyle='None',label='sumup', alpha=0.8)
+                        plt.legend()
+                        plt.title(profile_name)
+                        plt.show()
                     
     # %% Secondary PARCA cores
     print('Secondary PARCA cores')
@@ -660,8 +746,10 @@ def add_Greenland_profiles(df_sumup, necessary_variables, df_ref, short_ref):
             df['density'] = pd.to_numeric(df_raw.iloc[3:, 8], errors='coerce')
             df = df.loc[df.notnull().any(axis=1)].iloc[:-1,:]
             print('   ', profile_name, df_meta.iloc[10+count,0])
-            df['timestamp'] = '%i-01-01'%df_meta.iloc[10+count,1]
-            df['date'] = df_meta.iloc[10+count,1]*10000
+            # Ellen Mosley-Thompson:
+            # definitely in April -May
+            df['timestamp'] = '%i-05-01'%df_meta.iloc[10+count,1]
+            df['date'] = df_meta.iloc[10+count,1]*10000 + 501
             df['latitude'] = df_meta.iloc[10+count,2]
             df['longitude'] =  -abs(df_meta.iloc[10+count,3])
             df['elevation'] =  df_meta.iloc[10+count,4]
@@ -681,7 +769,7 @@ def add_Greenland_profiles(df_sumup, necessary_variables, df_ref, short_ref):
                                     var=['profile','profile_name','date',
                                          'midpoint', 'density'],
                                     verbose=1)
-            df_sumup = pd.concat((df_sumup, df), ignore_index=True)
+            df_sumup = pd.concat((df_sumup, df[necessary_variables]), ignore_index=True)
     
             if do_plot:
                 plt.plot(df.midpoint,df.density, marker='d', linestyle='None',
@@ -722,8 +810,21 @@ def add_Greenland_profiles(df_sumup, necessary_variables, df_ref, short_ref):
                 df['density'] = pd.to_numeric(df_raw.iloc[3:, j+2], errors='coerce')
             df = df.loc[df.notnull().any(axis=1)].iloc[:-1,:]
             print('   ', df_meta.iloc[count,0])
-            df['timestamp'] = '%i-01-01'%df_meta.iloc[count,1]
-            df['date'] = df_meta.iloc[count,1]*10000
+            if k == 0:
+                # E. Mosley-Thompson: GITS 1996 core drilled May 7 - 11
+                assert df_meta.iloc[count,1] == 1996
+                df['timestamp'] = '1996-05-10'
+                df['date'] = 19960510
+            if k == 1:
+                # E. Mosley-Thompson: Humboldt 1995 drilled in April-May windows
+                assert df_meta.iloc[count,1] == 1995
+                df['timestamp'] = '1995-05-01'
+                df['date'] = 19950501
+            if k == 2:
+                # E. Mosley-Thompson: NASA-U 1995 drilled in May 20 - 24
+                assert df_meta.iloc[count,1] == 1995
+                df['timestamp'] = '1995-05-20'
+                df['date'] = 19950520
             df['latitude'] = df_meta.iloc[count,2]
             df['longitude'] =  -df_meta.iloc[count,3]
             df['elevation'] =  df_meta.iloc[count,4]
@@ -743,7 +844,7 @@ def add_Greenland_profiles(df_sumup, necessary_variables, df_ref, short_ref):
                                     var=['profile','profile_name','date',
                                          'midpoint', 'density'],
                                     verbose=1)
-            df_sumup = pd.concat((df_sumup, df), ignore_index=True)
+            df_sumup = pd.concat((df_sumup, df[necessary_variables]), ignore_index=True)
     
             if do_plot:
                 plt.plot(df.midpoint,df.density, marker='d', linestyle='None',
@@ -921,8 +1022,8 @@ def add_Greenland_profiles(df_sumup, necessary_variables, df_ref, short_ref):
     df['start_depth'] = df['start_depth']/100
     df['stop_depth'] = df['stop_depth']/100
     df['density'] = df['density']*1000
-    df['reference_full'] = 'Sorge, E. Glaziologische Untersuchungen in Eismitte, 5. Beitrag. p62-263 in K. Wegener: Wissenschaftliche Ergebnisse der deutschen Grönland-Expedition Alfred Wegener 1929 und 1930/1931 Bd. III Glaziologie. and Abermann, J., Vandecrux, B., Scher, S. et al. Learning from Alfred Wegener’s pioneering field observations in West Greenland after a century of climate change. Sci Rep 13, 7583 (2023). https://doi.org/10.1038/s41598-023-33225-9'
-    df['reference_short'] = 'Sorge et al. (1935), Abermann et al. (2023)' 
+    df['reference_full'] = 'Sorge, E. Glaziologische Untersuchungen in Eismitte, 5. Beitrag. p62-263 in K. Wegener: Wissenschaftliche Ergebnisse der deutschen Grönland-Expedition Alfred Wegener 1929 und 1930/1931 Bd. III Glaziologie.  as in  Abermann, J., Vandecrux, B., Scher, S. et al. Learning from Alfred Wegener’s pioneering field observations in West Greenland after a century of climate change. Sci Rep 13, 7583 (2023). https://doi.org/10.1038/s41598-023-33225-9'
+    df['reference_short'] = 'Sorge et al. (1935) as in Abermann et al. (2023)' 
     df['reference'] = df_sumup.reference.max() + 1
     df['latitude'] = 71.183
     df['longitude'] = -39.9333
@@ -952,8 +1053,8 @@ def add_Greenland_profiles(df_sumup, necessary_variables, df_ref, short_ref):
     df['start_depth'] = df['start_depth']/100
     df['stop_depth'] = df['stop_depth']/100
     df['density'] = df['density']
-    df['reference_full'] = 'Jülg, H. Dichtebestimmungen und Schneesondierung auf der Route 1–400 km. Deutsche Grönland-Expedition Alfred Wegener 1929 und 1930/31. Wissenschaftliche Ergebnisse vol. 4.2, 329–345 (1939) and Abermann, J., Vandecrux, B., Scher, S. et al. Learning from Alfred Wegener’s pioneering field observations in West Greenland after a century of climate change. Sci Rep 13, 7583 (2023). https://doi.org/10.1038/s41598-023-33225-9'
-    df['reference_short'] = 'Jülg (1939), Abermann et al. (2023)' 
+    df['reference_full'] = 'Jülg, H. Dichtebestimmungen und Schneesondierung auf der Route 1–400 km. Deutsche Grönland-Expedition Alfred Wegener 1929 und 1930/31. Wissenschaftliche Ergebnisse vol. 4.2, 329–345 (1939) as in Abermann, J., Vandecrux, B., Scher, S. et al. Learning from Alfred Wegener’s pioneering field observations in West Greenland after a century of climate change. Sci Rep 13, 7583 (2023). https://doi.org/10.1038/s41598-023-33225-9'
+    df['reference_short'] = 'Jülg (1939) as in Abermann et al. (2023)' 
     df['reference'] = df_sumup.reference.max() + 1
     df['latitude'] = meta.set_index('RA').loc[df.RA.values, 'latitude'].values
     df['longitude'] = meta.set_index('RA').loc[df.RA.values, 'longitude'].values
@@ -1321,8 +1422,8 @@ def add_Greenland_profiles(df_sumup, necessary_variables, df_ref, short_ref):
     df.columns = ['start_depth', 'stop_depth', 'density']
     
     df['midpoint'] = df.start_depth + (df.stop_depth - df.start_depth)/2
-    df['reference_full'] =  'Colgan, W., Pedersen, A., Binder, D., Machguth, H., Abermann, J., & Jayred, M. (2018). Initial field activities of the Camp Century Climate Monitoring Programme in Greenland. GEUS Bulletin, 41, 75-78. https://doi.org/10.34194/geusb.v41.4347. Data: Colgan, William, 2021, "Camp Century: Firn density measurements in cores B73 and B62", https://doi.org/10.22008/FK2/UFGONU, GEUS Dataverse, V1'
-    df['reference_short'] = 'Colgan et al. (2018)' 
+    df['reference_full'] =  'Colgan, W., Pedersen, A., Binder, D., Machguth, H., Abermann, J., & Jayred, M. (2018). Initial field activities of the Camp Century Climate Monitoring Programme in Greenland. GEUS Bulletin, 41, 75-78. https://doi.org/10.34194/geusb.v41.4347. Data: Colgan, W., Camp Century: Firn density measurements in cores B73 and B62, https://doi.org/10.22008/FK2/UFGONU, GEUS Dataverse, V1, 2021'
+    df['reference_short'] = 'Colgan et al. (2018), Colgan (2021)' 
     df['reference'] = df_sumup.reference.max() + 1
     df['profile'] = df_sumup.profile.max() + 1
     df['profile_name'] = 'Camp Century (Core B62)'
@@ -1371,7 +1472,7 @@ def add_Greenland_profiles(df_sumup, necessary_variables, df_ref, short_ref):
         df_sumup = pd.concat((df_sumup, df_formatted[necessary_variables]), ignore_index=True)
     # %% Kawakami Greenland SE Dome core
     print('adding Kawakami Greenland SE Dome core')
-    
+    ind_ref = df_sumup.reference.max()+1
     for k, f in enumerate(os.listdir("data/density data/Kawakami/")):
         df = pd.read_csv("data/density data/Kawakami/"+f,
                          sep='\t', skiprows=114, encoding ='mbcs')
@@ -1398,7 +1499,7 @@ def add_Greenland_profiles(df_sumup, necessary_variables, df_ref, short_ref):
             df['method'] = 10
         df['error'] = np.nan
         df['profile'] = df_sumup.profile.max()+1
-        df['reference'] = df_sumup.reference.max()+1
+        df['reference'] = ind_ref
         df['reference_short'] = "Kawakami et al. (2023)"
         # print(df[['profile_name','date', 'latitude','longitude','elevation', 'reference_short']].drop_duplicates().values)
         # sumup_index_conflict = check_conflicts(df_sumup, df,

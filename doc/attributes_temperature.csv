@@ -4,9 +4,9 @@ measurement_id, measurement_index, -, index of temperature measurement (unique f
 timestamp, timestamp_of_temperature_measurement, days since 1900-01-01, start date of measurement <measurement_id> (can be an estimation)
 temperature, subsurface_temperature, deg C, Measured temperature for measurement <measurement_id>
 depth, depth_of_subsurface_temperature, m, Depth of temperature measurement <measurement_id>
-error, error,  m w.e., Error associated with the temperature measurement <measurement_id>
-latitude, latitude, degree North, latitude of measurement <measurement_id>
-longitude, longitude, degree East, longitude of measurement <measurement_id>
+error, error,  deg C, Error associated with the temperature measurement <measurement_id>
+latitude, latitude, deg North, latitude of measurement <measurement_id>
+longitude, longitude, deg East, longitude of measurement <measurement_id>
 elevation, elevation, m, elevation of measurement <measurement_id>
 name_key, name_key, -, Name key associated to  measurement <measurement_id> (core name or location)
 method_key, method_key, -, method key of measurement <measurement_id>

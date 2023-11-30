@@ -14,17 +14,18 @@ Surface mass balance, subsurface temperature and density measurements from the G
 </strong>
 </h1> 
 
-## This repository contains the scripts used for compiling the different datasets
-[Another repository contains the raw data but is kept private](https://github.com/SUMup-database/SUMup-2023). Access will be granted to however wants to become a maintener.
-
 ## Quick links:
-- [The SUMup 2023 release](https://arcticdata.io/catalog/view/urn%3Auuid%3A57f4cf76-1470-4ad2-b2ed-69e52ce85387)
+- [The SUMup 2023 release](https://www.doi.org/10.18739/A2M61BR5M)
+- [The SUMup 2023 ReadMe file](SUMup%202023%20beta/SUMup_2023_ReadMe.pdf)
 - [Example Python scripts / Jupyter notebooks to manipulate the 2023 files](https://github.com/SUMup-database/SUMup-example-scripts)
-- [The new netcdf format](https://github.com/SUMup-database/SUMup-2023-compilation-scripts#the-new-netcdf-structure)
-- [The CSV files](https://github.com/SUMup-database/SUMup-2023-compilation-scripts#the-csv-files)
-- [2022 release](https://doi.org/10.18739/A24Q7QR58)
+- [The new netcdf format](https://github.com/SUMup-database/SUMup-2023/blob/main/README.md#the-new-netcdf-structure)
+- [The CSV files](https://github.com/SUMup-database/SUMup-2023/blob/main/README.md#the-csv-files)
 
-## The 2023 (beta) release
+## The 2023 release
+### Reference:
+
+Vandecrux, B., Amory, C., Ahlstrøm, A.P., Akers, P.D., Albert, M., Alley, R.B., Arnaud, L., Bales, R., Benson, C., Box, J.E., Buizert, C., Charalampidis, C., Clerx, N., Covi, F., Denis, G., Dibb, J.E., Ding, M., Eisen, O., Fausto, R., Fernandoy, F., Freitag, J., Gerland, S., Harper, J., Hawley, R.L., Hock, R., How, P., Hubbard, B., Humphrey, N., Iizuka, Y., Isaksson, E., Kameda, T., Karlsson, N.B., Kawakami, K., Kjær, H.A., Kuipers Munneke, P., Lewis, G., MacFerrin, M., Machguth, H., Mankoff, K.D., McConnell, J.R., Medley, B., Morris, E., Mosley-Thompson, E., Mulvaney, R., Niwano, M., Osterberg, E., Otosaka, I., Picard, G., Polashenski, C., Rennermalm, A., Rutishauser, A., Simonsen, S.B., Smith, A., Solgaard, A., Spencer, M., Steen-Larsen, H.C., Stevens, C.M., Sugiyama, S., Tedesco, M., Thompson-Munson, M., Tsutaki, S., van As, D., Van den Broeke, M.R., Wilhelms, F., Xiao, J., Xiao, C.: The SUMup collaborative database: Surface mass balance, subsurface temperature and density measurements from the Greenland and Antarctic ice sheets (1912 - 2023), Arctic Data Center, https://www.doi.org/10.18739/A2M61BR5M, 2023.
+
 ### Important notes on the 2023 release:
 - Snow depth on sea ice is dropped. This was discussed with Nathan Kurtz who initiated this part of SUMup. The sea ice community did not reuse or feeded into SUMup's snow depth on sea ice data. In absence of volunteer to mobilize that community, offshore data is being removed from the next release of the data.
 - The next release will contain SMB data, instead of just snow accumulation.
@@ -38,7 +39,7 @@ The original dataset was described in:
 
 Montgomery, L., Koenig, L., and Alexander, P.: **The SUMup dataset: compiled measurements of surface mass balance components over ice sheets and sea ice with analysis over Greenland**, Earth Syst. Sci. Data, 10, 1959–1985, [https://doi.org/10.5194/essd-10-1959-2018](https://doi.org/10.5194/essd-10-1959-2018), 2018.
 
-The latest release of the SUMup data is available at:
+The 2022 release of the SUMup data is available at:
 
 Megan Thompson-Munson, Lynn Montgomery, Jan Lenaerts, and Lora Koenig. 2022. **Surface Mass Balance and Snow Depth on Sea Ice Working Group (SUMup) snow density, accumulation on land ice, and snow depth on sea ice datasets 1952-2019**. Arctic Data Center. [https://doi.org/10.18739/A24Q7QR58](https://doi.org/10.18739/A24Q7QR58).
 

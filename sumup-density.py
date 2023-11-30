@@ -66,6 +66,10 @@ df_sumup['method_str'] = df_methods.loc[df_sumup.method, 'method'].values
 short_ref = parse_short_reference(df_sumup).set_index('reference')
 
 for ref, s in zip(short_ref.index, short_ref.reference_short):
+    if s.startswith('Fernandoy et al. (2010'): short_ref.loc[ref, 'reference_short'] = 'Fernandoy (2010a,b,c)'  
+    if s.startswith('Wagenbach et al. (1994'): short_ref.loc[ref, 'reference_short'] = 'Wagenbach (1994a,b,c,d)'  
+    if s.startswith('Ohmura et al. ('): short_ref.loc[ref, 'reference_short'] = 'Ohmura (1991, 1992)'  
+    if s.startswith('Benson et al. ('): short_ref.loc[ref, 'reference_short'] = 'Benson (1962, 2010, 2013)'  
     if s.startswith('Smeets et al. (2016'): short_ref.loc[ref, 'reference_short'] = 'Smeets et al. (2016a,b,c,d)'  
     if s.startswith('Wilhelms et al. (2000'): short_ref.loc[ref, 'reference_short'] = 'Wilhelms et al. (2000a,b,c,d)'  
     if s.startswith('Miller et al. (2000'): short_ref.loc[ref, 'reference_short'] = 'Miller and Schwager (2000a,b)'  
@@ -168,7 +172,7 @@ df_sumup = pd.concat((df_sumup, df[necessary_variables]), ignore_index=True)
 
 #%% Stevens 2023 USP50
 print('loading Stevens 2023 USP50')
-
+ind_ref=df_sumup.reference.max()+1
 for k, f in enumerate(os.listdir("data/density data/Stevens2023/")):
     if 'README' in f:
         continue
@@ -184,7 +188,7 @@ for k, f in enumerate(os.listdir("data/density data/Stevens2023/")):
     
     df['midpoint'] = df['start_depth'] + (df['stop_depth'] - df['start_depth'])/2
    
-    df['reference_full'] = "Stevens, C., Conway, H., Fudge, T. J., Koutnik, M., Lilien, D., & Waddington, E. D. (2023) Firn density and compaction rates 50km upstream of South Pole U.S. Antarctic Program (USAP) Data Center. doi: https://doi.org/10.15784/601680. "
+    df['reference_full'] = "Stevens, C., Lilien, D., Conway, H., Fudge, T., Koutnik, M., & Waddington, E. (2023). A new model of dry firn-densification constrained by continuous strain measurements near South Pole. Journal of Glaciology, 1-15. doi:10.1017/jog.2023.87. Data: Stevens, C., Conway, H., Fudge, T. J., Koutnik, M., Lilien, D., & Waddington, E. D. (2023) Firn density and compaction rates 50km upstream of South Pole U.S. Antarctic Program (USAP) Data Center. doi: https://doi.org/10.15784/601680. "
     df['latitude'] = -89.54
     df['longitude'] =  137.04
     df['elevation'] = np.nan
@@ -194,7 +198,7 @@ for k, f in enumerate(os.listdir("data/density data/Stevens2023/")):
     df['method'] = 4
     df['error'] = np.nan
     df['profile'] = df_sumup.profile.max()+1
-    df['reference'] = df_sumup.reference.max()+1
+    df['reference'] = ind_ref
     df['reference_short'] = "Stevens et al. (2023)"
     print(df[['profile_name','date', 'latitude','longitude','elevation', 'reference_short']].drop_duplicates().values)
     sumup_index_conflict = check_conflicts(df_sumup, df,
@@ -588,6 +592,8 @@ def write_netcdf(df_sumup, filename):
     df_new['timestamp'] = pd.to_datetime(df_new.timestamp).dt.tz_localize(None)
 
     df_new.index.name='measurement_id'
+    assert (~df_new.index.duplicated()).all(), 'non-unique measurement-id "'
+
     ds_meta_name = (df_new[['profile_key','profile']]
                     .drop_duplicates()
                     .set_index('profile_key')
@@ -718,7 +724,9 @@ print_table_dataset_composition(df_sumup.loc[df_sumup.latitude>0]).to_csv('doc/R
 
 print_table_dataset_composition(df_sumup.loc[df_sumup.latitude<0]).to_csv('doc/ReadMe_2023_src/tables/composition_density_antarctica.csv',index=None)
 
+print('writing out measurement locations')
+print_location_file(df_sumup.loc[df_sumup.latitude>0,:], 
+                    'doc/GIS/SUMup_2023_density_location_greenland.csv')
 
-# export position table
-df_sumup.loc[df_sumup.latitude>0, ['profile','profile_key','latitude','longitude','reference_short']].drop_duplicates().to_csv('doc/GIS/SUMup_2023_density_location_greenland.csv', index=None)
-
+print_location_file(df_sumup.loc[df_sumup.latitude<0, :],
+                    'doc/GIS/SUMup_2023_density_location_antarctica.csv')
